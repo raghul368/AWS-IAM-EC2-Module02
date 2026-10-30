@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AWS IAM and EC2 beginner project by Raghul A.">
+  <title>AWS IAM & EC2 | Cloud DevOps Project</title>
+  <style>
+    :root {
+      --navy: #10233f;
+      --blue: #2563eb;
+      --cyan: #38bdf8;
+      --ink: #172033;
+      --muted: #64748b;
+      --surface: #ffffff;
+      --background: #f3f7fc;
+      --border: #e2e8f0;
+      --green: #0f9f6e;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--background);
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1100px, 92%); margin: auto; }
+    header {
+      background: var(--navy);
+      color: white;
+      padding: 18px 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 4px 18px #0b1b332b;
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { font-size: 1.15rem; font-weight: 800; letter-spacing: .3px; }
+    .brand span { color: var(--cyan); }
+    nav { display: flex; flex-wrap: wrap; gap: 18px; font-size: .92rem; }
+    nav a { color: #e2e8f0; }
+    nav a:hover { color: var(--cyan); }
+    .hero {
+      color: white;
+      background: linear-gradient(120deg, #10233f 0%, #174a80 60%, #1676a8 100%);
+      padding: 78px 0 72px;
+    }
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 12px;
+      border: 1px solid #ffffff55;
+      border-radius: 999px;
+      color: #d8f3ff;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+    }
+    h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.12; margin: 20px 0 14px; }
+    .hero p { max-width: 680px; color: #e2edfa; font-size: 1.08rem; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+    .btn {
+      display: inline-block; padding: 11px 18px; border-radius: 9px;
+      font-weight: 700; background: white; color: var(--navy);
+    }
+    .btn.secondary { background: transparent; color: white; border: 1px solid #ffffff80; }
+    section { padding: 58px 0; }
+    .section-heading { margin-bottom: 25px; }
+    .section-heading h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin: 0 0 7px; color: var(--navy); }
+    .section-heading p { color: var(--muted); margin: 0; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 15px; padding: 22px; box-shadow: 0 8px 25px #10233f0a;
+    }
+    .card h3 { margin: 8px 0; color: var(--navy); }
+    .icon {
+      width: 42px; height: 42px; display: grid; place-items: center;
+      border-radius: 12px; background: #e8f3ff; color: var(--blue); font-size: 1.25rem;
+    }
+    .card p, .muted { color: var(--muted); }
+    .pill {
+      display: inline-block; background: #e8f7f1; color: #08784f;
+      border-radius: 999px; padding: 4px 10px; font-size: .78rem; font-weight: 700;
+    }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    ul.clean { padding-left: 20px; color: var(--muted); }
+    ul.clean li { margin: 8px 0; }
+    .architecture {
+      background: #0d1b2e; color: #e5f1ff; border-radius: 16px;
+      padding: 25px; text-align: center; overflow-x: auto;
+    }
+    .arch-node {
+      display: inline-block; min-width: 190px; padding: 12px 18px;
+      border: 1px solid #60a5fa; border-radius: 10px; background: #183654;
+      font-weight: 700;
+    }
+    .arch-arrow { color: #7dd3fc; font-size: 1.4rem; line-height: 1.7; }
+    .steps { counter-reset: step; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .step {
+      background: white; border: 1px solid var(--border); border-radius: 13px;
+      padding: 18px 18px 18px 58px; position: relative;
+    }
+    .step::before {
+      counter-increment: step; content: counter(step);
+      position: absolute; left: 17px; top: 17px; width: 27px; height: 27px;
+      display: grid; place-items: center; border-radius: 50%;
+      color: white; background: var(--blue); font-weight: 700;
+    }
+    .notice {
+      background: #fff8e8; border-left: 4px solid #e5a000;
+      padding: 15px 18px; border-radius: 8px; color: #72510a;
+    }
+    .contact { background: var(--navy); color: white; border-radius: 16px; padding: 30px; }
+    .contact p { color: #d6e3f3; }
+    footer { background: #09172a; color: #aebdd0; text-align: center; padding: 22px 0; font-size: .9rem; }
+    @media (max-width: 760px) {
+      .nav { align-items: flex-start; flex-direction: column; }
+      nav { gap: 12px; }
+      .grid, .two-col, .steps { grid-template-columns: 1fr; }
+      .hero { padding: 58px 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#home">AWS <span>Cloud Project</span></a>
+      <nav aria-label="Main navigation">
+        <a href="#overview">Overview</a>
+        <a href="#iam">IAM</a>
+        <a href="#ec2">EC2</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#deployment">Deployment</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="container">
+        <span class="eyebrow">MODULE 02 · AWS IAM & EC2</span>
+        <h1>Building and Hosting a Website on AWS EC2</h1>
+        <p>A beginner Cloud & DevOps project demonstrating AWS Identity and Access Management,
+          secure instance configuration, and deployment of a basic HTML website using a web server.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#overview">Explore Project</a>
+          <a class="btn secondary" href="#deployment">Deployment Steps</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="overview">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Project Overview</h2>
+          <p>What this project demonstrates.</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <div class="icon">🔐</div>
+            <h3>AWS IAM</h3>
+            <p>Understand users, groups, roles, policies, permissions, and the principle of least privilege.</p>
+          </article>
+          <article class="card">
+            <div class="icon">☁️</div>
+            <h3>Amazon EC2</h3>
+            <p>Launch and configure a virtual server in the AWS cloud to host a website.</p>
+          </article>
+          <article class="card">
+            <div class="icon">🌐</div>
+            <h3>Web Deployment</h3>
+            <p>Configure a security group, install a web server, and serve a static HTML page.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="iam">
+      <div class="container">
+        <div class="section-heading">
+          <h2>1. AWS Identity and Access Management</h2>
+          <p>IAM helps control access to AWS services and resources.</p>
+        </div>
+        <div class="two-col">
+          <article class="card">
+            <h3>Core IAM components</h3>
+            <ul class="clean">
+              <li><strong>Users:</strong> Identities for people or applications.</li>
+              <li><strong>Groups:</strong> Collections of users with shared permissions.</li>
+              <li><strong>Roles:</strong> Identities that provide temporary credentials to trusted entities.</li>
+              <li><strong>Policies:</strong> JSON permission documents that define allowed or denied actions.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Security best practices</h3>
+            <ul class="clean">
+              <li>Apply least privilege: grant only the permissions required.</li>
+              <li>Enable multi-factor authentication (MFA).</li>
+              <li>Do not share access keys or private credentials.</li>
+              <li>Review permissions regularly and remove unused access.</li>
+            </ul>
+            <span class="pill">Security first</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="ec2">
+      <div class="container">
+        <div class="section-heading">
+          <h2>2. Amazon EC2</h2>
+          <p>Amazon Elastic Compute Cloud provides resizable virtual servers called instances.</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <h3>Launch an instance</h3>
+            <p>Select an Amazon Machine Image (AMI), instance type, key pair, network, and storage settings.</p>
+          </article>
+          <article class="card">
+            <h3>Configure a security group</h3>
+            <p>Allow HTTP on port 80 for website traffic. Restrict SSH on port 22 to your trusted IP address.</p>
+          </article>
+          <article class="card">
+            <h3>Install a web server</h3>
+            <p>Install and start Apache HTTP Server, then place the website files in its document root.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <div class="container">
+        <div class="section-heading">
+          <h2>3. Basic AWS Architecture</h2>
+          <p>High-level flow for serving a static website from an EC2 instance.</p>
+        </div>
+        <div class="architecture" role="img" aria-label="User connects through the internet to an AWS VPC, security group, EC2 instance, Apache web server, and HTML website">
+          <div class="arch-node">User / Web Browser</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node">Internet</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node">AWS VPC</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node">Security Group · HTTP 80</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node">Amazon EC2 Instance</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node">Apache Web Server</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node">HTML / CSS Website</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="deployment">
+      <div class="container">
+        <div class="section-heading">
+          <h2>4. Deployment Workflow</h2>
+          <p>Typical steps to deploy this page on an Amazon Linux EC2 instance.</p>
+        </div>
+        <div class="steps">
+          <div class="step"><strong>Launch EC2</strong><br><span class="muted">Choose an Amazon Linux AMI and a suitable instance type.</span></div>
+          <div class="step"><strong>Set network access</strong><br><span class="muted">Allow HTTP (80); restrict SSH (22) to your own IP address.</span></div>
+          <div class="step"><strong>Connect securely</strong><br><span class="muted">Connect using EC2 Instance Connect or SSH with your key pair.</span></div>
+          <div class="step"><strong>Install Apache</strong><br><span class="muted">Install and start the Apache web server.</span></div>
+          <div class="step"><strong>Upload website files</strong><br><span class="muted">Copy this index.html file to /var/www/html/.</span></div>
+          <div class="step"><strong>Test the website</strong><br><span class="muted">Open http://YOUR-EC2-PUBLIC-IP in a browser.</span></div>
+        </div>
+        <div class="notice" style="margin-top:22px">
+          <strong>Important:</strong> Replace the sample public IP with the actual public IPv4 address of your running EC2 instance.
+          The website is not live until you deploy it to a hosting service.
+        </div>
+      </div>
+    </section>
+
+    <section id="outcomes">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Learning Outcomes</h2>
+          <p>Skills covered in this beginner project.</p>
+        </div>
+        <div class="card">
+          <ul class="clean">
+            <li>Explain IAM users, groups, roles, and policies.</li>
+            <li>Apply basic AWS security and least-privilege practices.</li>
+            <li>Launch and configure an EC2 instance.</li>
+            <li>Configure security group rules and connect to EC2.</li>
+            <li>Install a web server and deploy a basic HTML website.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="contact">
+          <h2>Project Information</h2>
+          <p><strong>Intern:</strong> Raghul A.</p>
+          <p><strong>Program:</strong> AWS Cloud & DevOps Internship</p>
+          <p><strong>Organization:</strong> Codomax Digital Solutions</p>
+          <p><strong>Module:</strong> 02 – AWS IAM & EC2</p>
+          <p>Created as a learning project to practice cloud identity management and basic web hosting.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">© 2026 AWS IAM & EC2 Learning Project · Created by Raghul A.</div>
+  </footer>
+</body>
+</html>
